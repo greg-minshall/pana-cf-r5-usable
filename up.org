@@ -1,0 +1,254 @@
+* trying to get this system up and running
+
+** control key
+
+out of the box, emacs 24 says, when pressing the "CAPS LOCK" key
+#+BEGIN_EXAMPLE
+<eisu-toggle> is undefined
+#+END_EXAMPLE
+
+then, if i run
+#+BEGIN_EXAMPLE
+setxkbmap -option ctrl:swapcaps
+#+END_EXAMPLE
+CAPS LOCK key works as a control key.  and, Ctrl key works as CAPS
+LOCK (which i don't really like).
+#+BEGIN_EXAMPLE
+setxkbmap -option ctrl:nocaps
+#+END_EXAMPLE
+makes *both* CAPS LOCK and Ctrl work as control keys.  *that's* what
+we want!
+
+** meta key
+
+i want to use either Muhenkan (sp?) or Windows key as meta key, both
+in shell and in Emacs.
+
+in emacs, out of the box, hitting key to {left,right,second
+right,third right} of space bar says
+#+BEGIN_EXAMPLE
+<muhenkan> is undefined
+<henkan> is undefined
+<hiragana-katagana> is undefined
+M-x (i.e., generates M-x)
+#+END_EXAMPLE
+
+also, seemingly out of the box, Alt works as Meta in emacs.  maybe i
+should just use that?  but, would be nice to have something on
+r.h.s. of keyboard as well.  plus, on mbp, i`m used to using Command
+keys, which are immediately left and right of space bar.  also, Alt
+does *not* work for the shell.
+
+#+BEGIN_SRC 
+awk '$1 != "#" { print $0; system("xmodmap -e \"" $0 "\"")}' revertxmodmap.txt
+xmodmap -pm
+#+END_SRC
+
+here is a nice (emacs-centric) [[http://www.emacswiki.org/emacs/MetaKeyProblems][discussion]] of meta key issues.  [[http://www.emacswiki.org/emacs/SettingMetaWithXKB][this]]
+discusses using xkb for doing this.
+
+#+BEGIN_SRC sh :var fname="foo.xkb" :results silent
+xkbcomp $DISPLAY ${fname}
+#+END_SRC
+
+*** [[https://en.wikipedia.org/wiki/X_keyboard_extension][xkb]]
+
+what's in [[file:/usr/share/X11/xkb/rules/base]]?
+
+the xkb wikipedia page points at [[http://michal.kosmulski.org/computing/articles/custom-keyboard-layouts-xkb.html][kosmulski]], 
+
+[[http://www.charvolant.org/~doug/xkb/html/xkb.html][charvolant]], which seems very good.  it includes these definitions
+#+BEGIN_EXAMPLE
+key codes
+    A translation of the scan codes from the keyboard into a suitable symbolic form.
+
+key symbols
+    A translation of symbolic key codes into actual symbols, such as an A or an .
+
+compatibility map
+    A specification of what actions various special-purpose keys produce.
+
+type
+    A specification of what various shift combinations produce.
+
+geometry
+    A description of the physical layout of a keyboard. 
+#+END_EXAMPLE
+
+also, this statement
+#+BEGIN_QUOTE
+ The basic modifier keys are all very well but it would be handy to be
+ able to introduce a level of abstraction, so that you can talk about
+ modifier keys by function, rather than by explicit key name. XKB
+ allows the use of virtual modifier keys, where a basic modifier key
+ (or combination) is mapped onto a named virtual modifier. Virtual
+ modifiers can then be used to describe the behaviour of the keyboard,
+ decoupling the exact physical capabilities of the keyboard you are
+ using from the sort of characters that you want to type. The types
+ and compat components are largely responsible for handling this side
+ of things.
+#+END_QUOTE
+
+it points at /usr/include/X11/keysymdef.h, which includes lines like
+#+BEGIN_EXAMPLE
+#define XK_Muhenkan                      0xff22  /* Cancel Conversion */
+#define XK_Henkan_Mode                   0xff23  /* Start/Stop Conversion */
+#define XK_Henkan                        0xff23  /* Alias for Henkan_Mode */
+#define XK_Hiragana_Katakana             0xff27  /* Hiragana/Katakana toggle */
+#define XK_Alt_L                         0xffe9  /* Left alt */
+#+END_EXAMPLE
+and, in fact, pressing the Alt key on lhs of space bar produces Alt_L, 0xffe9.
+
+running xev, looking at keys on bottom row, from Fn (which doesn't
+appear to generate anything) to Ctrl_R, we get (looking only at
+KeyPress events):
+#+BEGIN_EXAMPLE
+KeyPress event, serial 29, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14839081, (667,371), root:(668,372),
+    state 0x0, keycode 37 (keysym 0xffe3, Control_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14839956, (667,371), root:(668,372),
+    state 0x0, keycode 133 (keysym 0xffeb, Super_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14840771, (667,371), root:(668,372),
+    state 0x0, keycode 64 (keysym 0xffe9, Alt_L), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14841571, (667,371), root:(668,372),
+    state 0x0, keycode 102 (keysym 0xff22, Muhenkan), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14842506, (667,371), root:(668,372),
+    state 0x0, keycode 65 (keysym 0x20, space), same_screen YES,
+    XLookupString gives 1 bytes: (20) " "
+    XmbLookupString gives 1 bytes: (20) " "
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14843466, (667,371), root:(668,372),
+    state 0x0, keycode 100 (keysym 0xff23, Henkan_Mode), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14844215, (667,371), root:(668,372),
+    state 0x0, keycode 101 (keysym 0xff27, Hiragana_Katakana), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14845020, (667,371), root:(668,372),
+    state 0x0, keycode 135 (keysym 0xff67, Menu), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+
+KeyPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 14845820, (667,371), root:(668,372),
+    state 0x0, keycode 105 (keysym 0xffe4, Control_R), same_screen YES,
+    XLookupString gives 0 bytes: 
+    XmbLookupString gives 0 bytes: 
+    XFilterEvent returns: False
+#+END_EXAMPLE
+
+[[file:/usr/share/X11/xkb/keycodes/evdev]] includes lines like
+#+BEGIN_EXAMPLE
+        // Microsoft keyboard extra keys
+        <LWIN> = 133;
+        <COMP> = 135;
+        alias <MENU> = <COMP>;
+
+        // Keys that are generated on Japanese keyboards
+        <HKTG> = 101;   // Hiragana/Katakana toggle
+        <HENK> = 100;   // Henkan
+        <MUHE> = 102;   // Muhenkan
+        <AE13> = 132;   // Yen
+        <KATA> =  98;   // Katakana
+        <HIRA> =  99;   // Hiragana
+        <JPCM> = 103;   // KPJPComma
+        //<RO>   =  97; // Romaji
+#+END_EXAMPLE
+
+while [[file: /usr/share/X11/xkb/symbols/inet]] includes lines like
+#+BEGIN_EXAMPLE
+    key <HKTG>   {      [ Hiragana_Katakana     ]       };
+    key <HENK>   {      [ Henkan                ]       };
+    key <MUHE>   {      [ Muhenkan              ]       };
+    key <KATA>   {      [ Katakana              ]       };
+    key <HIRA>   {      [ Hiragana              ]       };
+    key <RO>     {      [ Romaji                ]       };
+#+END_EXAMPLE
+(while [[file: /usr/share/X11/xkb/symbols/jp]] doesn't include, e.g.,
+<MUHE>.)
+
+here's where, e.g., Muhenkan is used
+#+BEGIN_EXAMPLE
+bash minshall-CF-R5KWPAXP: {316} find /usr/share/X11/xkb/ -type f -exec grep -Hi muhenkan \{\} \;
+/usr/share/X11/xkb/keycodes/evdev:      <MUHE> = 102;   // Muhenkan
+/usr/share/X11/xkb/keycodes/xfree86:    <NFER> =   131;         // Muhenkan
+/usr/share/X11/xkb/geometry/hhk:// SW = 000 Layout with Muhenkan and Henkan keys
+/usr/share/X11/xkb/geometry/hhk:// SW = 001 Layout with Muhenkan and Henkan keys swapped with Alt keys
+/usr/share/X11/xkb/symbols/nec_vndr/jp:    key <NFER> { [ Muhenkan              ]       };
+/usr/share/X11/xkb/symbols/jp:    key <NFER> { [ Muhenkan               ] };
+/usr/share/X11/xkb/symbols/jp:    key <NFER> { [ Muhenkan               ]       };
+/usr/share/X11/xkb/symbols/inet:    key <MUHE>   {      [ Muhenkan              ]       };
+/usr/share/X11/xkb/symbols/fujitsu_vndr/jp:         key <UNK7> { [ Muhenkan     ]       };
+/usr/share/X11/xkb/symbols/sgi_vndr/jp:    key <NFER> {         [        Muhenkan ] };
+bash minshall-CF-R5KWPAXP: {317} 
+#+END_EXAMPLE
+so, keycodes gives the hardware code, and symbols maps that to a
+function. s.th. like that.
+
+#+BEGIN_EXAMPLE
+bash minshall-CF-R5KWPAXP: {318} grep -w meta_win /usr/share/X11/xkb/rules/base
+  altwin:meta_win       =       +altwin(meta_win)
+#+END_EXAMPLE
+and, in [[file:/usr/share/X11/xkb/symbols/altwin]]
+#+BEGIN_EXAMPLE
+partial modifier_keys 
+xkb_symbols "meta_win" {
+    key <LALT> { [ Alt_L, Alt_L ] };
+    key <RALT> { type[Group1] = "TWO_LEVEL",
+                 symbols[Group1] = [ Alt_R, Alt_R ] };
+    key <LWIN> { [ Meta_L ] };
+    key <RWIN> { [ Meta_R ] };
+    modifier_map Mod1 { Alt_L, Alt_R };
+    modifier_map Mod4 { <META>, Meta_L, Meta_R };
+};
+#+END_EXAMPLE
+so, that appears to be the binding between rules/ and other things?
+
+e.g., in [[file:/usr/share/X11/xkb/symbols/ctrl]], we have
+#+BEGIN_EXAMPLE
+// Eliminate CapsLock, making it another Ctrl.
+partial modifier_keys 
+xkb_symbols "nocaps" {
+    replace key <CAPS>  { [ Control_L, Control_L ] };
+    modifier_map  Control { <CAPS>, <LCTL> };
+};
+#+END_EXAMPLE
+corresponding, presumably, to
+#+BEGIN_EXAMPLE
+  ctrl:nocaps           =       +ctrl(nocaps)
+#+END_EXAMPLE
+in [[file:/usr/share/X11/xkb/rules/base]].
+
+** del key
+
+i'd like, at least in emacs, for the DEL key to act as Backspace.

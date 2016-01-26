@@ -249,6 +249,27 @@ corresponding, presumably, to
 #+END_EXAMPLE
 in [[file:/usr/share/X11/xkb/rules/base]].
 
+#+BEGIN_EXAMPLE
+    interpret Meta_L    {
+        action = SetMods(modifiers=Meta);
+    };
+#+END_EXAMPLE
+in [[file:/usr/share/X11/xkb/compat/misc]].  maybe we need something like
+this for Muhenkan, etc.?  i guess question is, where to do the
+mapping.  could be in symbols/inet directory (map to Meta_L, Meta_R)
+or in compat (map Muhenkan to Meta).
+
+according to xev(1), on mbp, (the left versions of) control and caps
+lock generate Control_L; option generates Mode_switch; and command
+generates Meta_L.  (and, like on panasonic, fn doesn't generate
+anything.)
+
+maybe, given rules/symbols mapping above, we should make something in
+symbols like japanmeta, which has xkb_symbols "japanmeta" { ... },
+then invoke from rules/base.
+
+i guess xev(1) doesn't map through Alt_L to Alt.
+
 ** del key
 
 i'd like, at least in emacs, for the DEL key to act as Backspace.

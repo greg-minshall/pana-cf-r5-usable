@@ -1,6 +1,6 @@
 * trying to get this system up and running
 
-** control key
+** DONE control key
 
 out of the box, emacs 24 says, when pressing the "CAPS LOCK" key
 #+BEGIN_EXAMPLE
@@ -19,10 +19,10 @@ setxkbmap -option ctrl:nocaps
 makes *both* CAPS LOCK and Ctrl work as control keys.  *that's* what
 we want!
 
-** meta key
+** TODO meta key
 
-i want to use either Muhenkan (sp?) or Windows key as meta key, both
-in shell and in Emacs.
+i want to use either Muhenkan or Windows key as meta key, both in
+shell and in Emacs.
 
 in emacs, out of the box, hitting key to {left,right,second
 right,third right} of space bar says
@@ -36,8 +36,7 @@ M-x (i.e., generates M-x)
 also, seemingly out of the box, Alt works as Meta in emacs.  maybe i
 should just use that?  but, would be nice to have something on
 r.h.s. of keyboard as well.  plus, on mbp, i`m used to using Command
-keys, which are immediately left and right of space bar.  also, Alt
-does *not* work for the shell.
+keys, which are immediately left and right of space bar.  
 
 #+BEGIN_SRC 
 awk '$1 != "#" { print $0; system("xmodmap -e \"" $0 "\"")}' revertxmodmap.txt
@@ -102,6 +101,7 @@ and, in fact, pressing the Alt key on lhs of space bar produces Alt_L, 0xffe9.
 running xev, looking at keys on bottom row, from Fn (which doesn't
 appear to generate anything) to Ctrl_R, we get (looking only at
 KeyPress events):
+:results:
 #+BEGIN_EXAMPLE
 KeyPress event, serial 29, synthetic NO, window 0x1c00001,
     root 0x7f, subw 0x0, time 14839081, (667,371), root:(668,372),
@@ -166,6 +166,7 @@ KeyPress event, serial 32, synthetic NO, window 0x1c00001,
     XmbLookupString gives 0 bytes: 
     XFilterEvent returns: False
 #+END_EXAMPLE
+:end:
 
 [[file:/usr/share/X11/xkb/keycodes/evdev]] includes lines like
 #+BEGIN_EXAMPLE
@@ -215,6 +216,88 @@ bash minshall-CF-R5KWPAXP: {317}
 so, keycodes gives the hardware code, and symbols maps that to a
 function. s.th. like that.
 
+here's a more complete "transitive closure" grep
+:results:
+#+BEGIN_EXAMPLE
+find /usr/share/X11/xkb/ -type f -exec egrep -Hi 'henkan|nfer|muhe|hiragana_katakana|hktg|henk' \{\} \;
+/usr/share/X11/xkb/keycodes/digital_vndr/lk:// LK421-JJ = lk421aj+MUHE+KANJ+HIRA
+/usr/share/X11/xkb/keycodes/digital_vndr/lk:// LK401-BJ = lk401  +MUHE+KANJ+HIRA
+/usr/share/X11/xkb/keycodes/digital_vndr/lk:    <MUHE>  = 94;
+/usr/share/X11/xkb/keycodes/digital_vndr/lk:    <MUHE>  = 94;
+/usr/share/X11/xkb/keycodes/digital_vndr/pc:// PCXAJ-AA = pc+BKSL+AC12+AB11+MUHE+KANJ+HIRA+indicator
+/usr/share/X11/xkb/keycodes/digital_vndr/pc:// LK411-AJ = lk411+MUHE+KANJ+HIRA
+/usr/share/X11/xkb/keycodes/digital_vndr/pc:// LK411-JJ = lk411+BKSL+AZ01+MUHE+KANJ+HIRA
+/usr/share/X11/xkb/keycodes/digital_vndr/pc:    <MUHE>  = 133;
+/usr/share/X11/xkb/keycodes/digital_vndr/pc:    <MUHE>  = 133;
+/usr/share/X11/xkb/keycodes/evdev:	<HKTG> = 101;	// Hiragana/Katakana toggle
+/usr/share/X11/xkb/keycodes/evdev:	<HENK> = 100;	// Henkan
+/usr/share/X11/xkb/keycodes/evdev:	<MUHE> = 102;	// Muhenkan
+/usr/share/X11/xkb/keycodes/xfree98:    <NFER> =  89;
+/usr/share/X11/xkb/keycodes/sun:    <HENK> = 124;
+/usr/share/X11/xkb/keycodes/sun:    alias <EXEC> = <NFER>;  // 131
+/usr/share/X11/xkb/keycodes/sun:    alias <HENK> = <HKTG>;  // 208
+/usr/share/X11/xkb/keycodes/sgi_vndr/indy:    <NFER> = 141;
+/usr/share/X11/xkb/keycodes/sgi_vndr/indy:    <HKTG> = 143;
+/usr/share/X11/xkb/keycodes/xfree86:    <HKTG> =   208;		// Hiragana_Katakana toggle
+/usr/share/X11/xkb/keycodes/xfree86:    <XFER> =   129;		// Henkan
+/usr/share/X11/xkb/keycodes/xfree86:    <NFER> =   131;		// Muhenkan
+/usr/share/X11/xkb/keycodes/xfree86:    alias <I03> = <NFER>;
+/usr/share/X11/xkb/keycodes/xfree86:    alias <K70> = <HKTG>;	// <I50>
+/usr/share/X11/xkb/geometry/digital_vndr/lk:		    { <MUHE>, "LONG" },
+/usr/share/X11/xkb/geometry/digital_vndr/pc:		    { <MUHE>, "NORM" }, 
+/usr/share/X11/xkb/geometry/digital_vndr/unix:		    { <MUHE>, "LONG" },
+/usr/share/X11/xkb/geometry/nec:	    keys { { <ALGR>, 35 } , <LALT>, { <NFER>, "FUNC" },
+/usr/share/X11/xkb/geometry/typematrix:// – WWW key becomes <HKTG>
+/usr/share/X11/xkb/geometry/typematrix:// NFER/MEHU and XFER/KANJ: TMx keeps LWIN (and RWIN if it happens to exist).
+/usr/share/X11/xkb/geometry/typematrix:// HKTG/HIRA: TMx keeps MENU/COMP, but locates this key in alpha section (see above).
+/usr/share/X11/xkb/geometry/typematrix:            keys { <HKTG> };
+/usr/share/X11/xkb/geometry/pc:	    keys { <LCTL>, { <LALT>, 20 },<NFER>,
+/usr/share/X11/xkb/geometry/pc:		   <XFER>,<HKTG>,<RALT>, { <RCTL>, 17 }
+/usr/share/X11/xkb/geometry/sun:		 { <SPCE>, "SPCE" }, { <KANJ>, "KANJ" }, <HENK>,
+/usr/share/X11/xkb/geometry/hhk:// SW = 000 Layout with Muhenkan and Henkan keys
+/usr/share/X11/xkb/geometry/hhk:				{ <NFER>, "DIAM" },
+/usr/share/X11/xkb/geometry/hhk:// SW = 001 Layout with Muhenkan and Henkan keys swapped with Alt keys
+/usr/share/X11/xkb/geometry/hhk:				<NFER>,
+/usr/share/X11/xkb/geometry/hhk:// SW = 010 Layout with Henkan key and left-diamond as Fn
+/usr/share/X11/xkb/geometry/hhk:// SW = 001 Layout with Henkan key swapped with Alt keys and left-Alt as Fn
+/usr/share/X11/xkb/geometry/sgi_vndr/O2:	    keys { <LCTL>, { <LALT>, 20 },<NFER>,
+/usr/share/X11/xkb/geometry/sgi_vndr/O2:		   <XFER>,<HKTG>,<RALT>, { <RCTL>, 17 }
+/usr/share/X11/xkb/geometry/sgi_vndr/indy:	    keys { <LCTL>, { <LALT>, 20 },<NFER>,
+/usr/share/X11/xkb/geometry/sgi_vndr/indy:		   <XFER>,<HKTG>,<RALT>, { <RCTL>, 17 }
+/usr/share/X11/xkb/geometry/sanwa:                   <LWIN>, <LALT>, <NFER>, {<SPCE>, "SPCE" }, <XFER>, <HKTG>,
+/usr/share/X11/xkb/symbols/nec_vndr/jp:    key <NFER> { [ Muhenkan		]	};
+/usr/share/X11/xkb/symbols/nec_vndr/jp:    key <XFER> { [ Henkan, Kanji	]	};
+/usr/share/X11/xkb/symbols/sun_vndr/jp:    key <HENK> { [ Henkan_Mode		        ]	};
+/usr/share/X11/xkb/symbols/sun_vndr/jp:    key <TLDE> { [ Henkan_Mode                          ]   };
+/usr/share/X11/xkb/symbols/sun_vndr/jp:    key <HENK> { [ Kana_Lock, Mode_switch               ]   };
+/usr/share/X11/xkb/symbols/sun_vndr/tw:    key <ALGR> { [ Henkan_Mode          ]                       };
+/usr/share/X11/xkb/symbols/kpdl:// when entering data by the keyboard; the comma can then be inferred
+/usr/share/X11/xkb/symbols/jp:    key <NFER> { [ Muhenkan		] };
+/usr/share/X11/xkb/symbols/jp:	symbols[Group1]= [ Henkan, Mode_switch ]
+/usr/share/X11/xkb/symbols/jp:    key <HKTG> {
+/usr/share/X11/xkb/symbols/jp:	symbols[Group1]= [ Hiragana_Katakana, Romaji ]
+/usr/share/X11/xkb/symbols/jp:	symbols[Group1]= [ Hiragana_Katakana ]
+/usr/share/X11/xkb/symbols/jp:    key <NFER> { [ Muhenkan		]	};
+/usr/share/X11/xkb/symbols/jp:	symbols[Group1]= [ Henkan, Mode_switch ]
+/usr/share/X11/xkb/symbols/jp:    key <HKTG> {
+/usr/share/X11/xkb/symbols/jp:	symbols[Group1]= [ Hiragana_Katakana, Romaji ]
+/usr/share/X11/xkb/symbols/inet:    key <HKTG>   {      [ Hiragana_Katakana     ]       };
+/usr/share/X11/xkb/symbols/inet:    key <HENK>   {      [ Henkan                ]       };
+/usr/share/X11/xkb/symbols/inet:    key <MUHE>   {      [ Muhenkan              ]       };
+/usr/share/X11/xkb/symbols/inet:    key <NFER>  {       [ XF86AudioPrev         ]       };
+/usr/share/X11/xkb/symbols/inet:    key <HKTG> {         [     XF86Launch7 ] };
+/usr/share/X11/xkb/symbols/inet:    key <NFER> {         [     XF86Launch2 ] };
+/usr/share/X11/xkb/symbols/inet:    key <NFER>	{	[ XF86Launch2		]	};
+/usr/share/X11/xkb/symbols/inet:    key <NFER>	{	[ XF86Launch2		]	};
+/usr/share/X11/xkb/symbols/fujitsu_vndr/jp:	    key <UNK7> { [ Muhenkan	]	};
+/usr/share/X11/xkb/symbols/fujitsu_vndr/jp:	    key <UNK8> { [ Henkan	]	};
+/usr/share/X11/xkb/symbols/sgi_vndr/jp:    key <NFER> {         [        Muhenkan ] };
+/usr/share/X11/xkb/symbols/sgi_vndr/jp:    key <HKTG> {         [ Hiragana_Katakana ] };
+/usr/share/X11/xkb/symbols/macintosh_vndr/jp:    replace key <HJCV> { [ Hiragana_Katakana ] };
+#+END_EXAMPLE
+:end:
+
+now
 #+BEGIN_EXAMPLE
 bash minshall-CF-R5KWPAXP: {318} grep -w meta_win /usr/share/X11/xkb/rules/base
   altwin:meta_win       =       +altwin(meta_win)
@@ -266,10 +349,110 @@ anything.)
 
 maybe, given rules/symbols mapping above, we should make something in
 symbols like japanmeta, which has xkb_symbols "japanmeta" { ... },
-then invoke from rules/base.
+then invoke from rules/base.  something like:
+#+BEGIN_EXAMPLE
+// Eliminate CapsLock, making it another Ctrl.
+partial modifier_keys 
+xkb_symbols "nocaps" {
+    replace key <CAPS>  { [ Control_L, Control_L ] };
+    modifier_map  Control { <CAPS>, <LCTL> };
+};
+
+#+END_EXAMPLE
 
 i guess xev(1) doesn't map through Alt_L to Alt.
 
-** del key
+setxkbmap(1) has a -Idirectory directive to add directories for rules,
+[etc.?].  that may be key.
+
+setxkbma(1) is annoying in that it doesn't seem to report errors when
+options aren't found, etc.
+
+#+BEGIN_SRC sh
+mkdir my-xkb
+mkdir my-xkb/rules
+mkdir my-xkb/symbols
+cat > my-xkb/rules/my-base <<EOF
+! option			=	symbols
+  jp:muhenkan_meta		=	+my-jp(muhenkan_meta)
+  jp:henkan_meta		=	+my-jp(henkan_meta)
+  jp:hiragana-katakana_alt	=	+my-jp(hiragana-katakana_alt)
+EOF
+cat > my-xkb/symbols/my-jp <<EOF
+// Make the Muhenkan key a left Meta.
+partial modifier keys
+xkb_symbols "muhenkan_meta" {
+    replace key <MUHE>	{ [ Meta_L ] };
+};
+
+// Make the Muhenkan key a right Meta.
+partial modifier keys
+xkb_symbols "henkan_meta" {
+    replace key <HENK>	{ [ Meta_R ] };
+};
+
+// Make the Hiragana-Katakana key a right Alt.
+partial modifier keys
+xkb_symbols "hiragana-katakana_alt" {
+    replace key <HKTG>	{ [ Alt_R ] };
+};
+EOF
+
+#+END_SRC
+
+#+RESULTS:
+
+*** TODO bash
+
+also, Alt does *not* work for the shell.  on mbp, i have
+~/.Xresources, with a line
+#+BEGIN_EXAMPLE
+Xterm*metaSendsEscape: true
+#+END_EXAMPLE
+which may be the reason?  well, if i ever get meta working, we'll see!
+
+** TODO del key
 
 i'd like, at least in emacs, for the DEL key to act as Backspace.
+
+** DONE track pad
+
+the track pad, when "tapped", generates a mouse event, which is
+annoying
+#+BEGIN_EXAMPLE
+ButtonPress event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 25837517, (54,446), root:(55,447),
+    state 0x0, button 1, same_screen YES
+
+ButtonRelease event, serial 32, synthetic NO, window 0x1c00001,
+    root 0x7f, subw 0x0, time 25837618, (54,446), root:(55,447),
+    state 0x100, button 1, same_screen YES
+#+END_EXAMPLE
+(from xev(1)).
+
+maybe comes from
+#+BEGIN_EXAMPLE
+    interpret Pointer_Button_Dflt+AnyOfOrNone(all) {
+        action= PtrBtn(button=default);
+    };
+#+END_EXAMPLE
+in output from xkbcome $DISPLAY, or, more originally?, from
+#+BEGIN_EXAMPLE
+    interpret Pointer_Button_Dflt {
+	action= PointerButton(button=default);
+    };
+#+END_EXAMPLE
+et al., in [[file:/usr/share/X11/xkb/compat/mousekeys]].
+
+oof.  [[https://fedoraproject.org/wiki/How_to_enable_touchpad_click][maybe]] need to modify some xorg.conf file?
+
+or, if [[http://unix.stackexchange.com/questions/242447/disable-touchpad-while-typing-and-also-touchpad-click-for-x-session][synaptics client]], use something.
+#+BEGIN_EXAMPLE
+synclient TapButton1=0
+#+END_EXAMPLE
+does the trick!
+
+** TODO click to activate
+
+as distributed, focus is by mouse.  it would be nice to have "click
+to activate"

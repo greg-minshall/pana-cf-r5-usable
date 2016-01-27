@@ -368,15 +368,23 @@ setxkbmap(1) has a -Idirectory directive to add directories for rules,
 setxkbma(1) is annoying in that it doesn't seem to report errors when
 options aren't found, etc.
 
+here's our try at some files.  turns out XkbRF_Load(3), that setxkbmap
+uses, needs to have rules/foo.lst, if one specifies -rules foo.
 #+BEGIN_SRC sh
 mkdir my-xkb
 mkdir my-xkb/rules
 mkdir my-xkb/symbols
-cat > my-xkb/rules/my-base <<EOF
+cat > my-xkb/rules/my-evdev <<EOF
 ! option			=	symbols
-  jp:muhenkan_meta		=	+my-jp(muhenkan_meta)
-  jp:henkan_meta		=	+my-jp(henkan_meta)
-  jp:hiragana-katakana_alt	=	+my-jp(hiragana-katakana_alt)
+  japan:muhenkan_meta		=	+my-jp(muhenkan_meta)
+  japan:henkan_meta		=	+my-jp(henkan_meta)
+  japan:hiragana-katakana_alt	=	+my-jp(hiragana-katakana_alt)
+EOF
+cat > my-xkb/rules/my-evdev.lst <<EOF
+! option
+japan:muhenkan_meta		Muhenkan as Meta_L
+japan:henkan_meta		Henkan as Meta_R
+japan:hiragana_katakana_alt	Hiragana-Katakana as Alt_R
 EOF
 cat > my-xkb/symbols/my-jp <<EOF
 // Make the Muhenkan key a left Meta.

@@ -19,6 +19,19 @@ setxkbmap -option ctrl:nocaps
 makes *both* CAPS LOCK and Ctrl work as control keys.  *that's* what
 we want!
 
+** DONE more escapes
+#+BEGIN_EXAMPLE
+setxkbmap -option japan:hztg_escape
+#+END_EXAMPLE
+
+would be nice
+
+** DONE win key
+#+BEGIN_EXAMPLE
+setxkbmap -I ./my-xkb/ -option altwin:alt_win
+#+END_EXAMPLE
+makes the win key an extra alt key
+
 ** TODO meta key
 
 i want to use either Muhenkan or Windows key as meta key, both in
@@ -502,7 +515,12 @@ man page for setxkbmap).
 #+BEGIN_EXAMPLE
 setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -print | xkbcomp -I./my-xkb/ -
 #+END_EXAMPLE
+works.  so does
+#+BEGIN_SRC sh :results silent
+setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -option japan:muhenkan_meta -print | xkbcomp -I./my-xkb/ - $DISPLAY 2>&1 | less
+#+END_SRC
 
+but, currently, hiragana-katakana_alt doesn't work
 
 *** TODO bash
 
@@ -548,11 +566,11 @@ et al., in [[file:/usr/share/X11/xkb/compat/mousekeys]].
 
 oof.  [[https://fedoraproject.org/wiki/How_to_enable_touchpad_click][maybe]] need to modify some xorg.conf file?
 
-or, if [[http://unix.stackexchange.com/questions/242447/disable-touchpad-while-typing-and-also-touchpad-click-for-x-session][synaptics client]], use something.
+or, if [[http://unix.stackexchange.com/questions/242447/disable-touchpad-while-typing-and-also-touchpad-click-for-x-session][synaptics client]], use something like:
 #+BEGIN_EXAMPLE
 synclient TapButton1=0
 #+END_EXAMPLE
-does the trick!
+does the trick!  (see "man 4 synaptics".)
 
 ** TODO click to activate
 

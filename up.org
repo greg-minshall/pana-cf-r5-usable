@@ -32,7 +32,7 @@ setxkbmap -I ./my-xkb/ -option altwin:alt_win
 #+END_EXAMPLE
 makes the win key an extra alt key
 
-** TODO meta key
+** DONE meta key
 
 i want to use either Muhenkan or Windows key as meta key, both in
 shell and in Emacs.
@@ -432,34 +432,34 @@ then emacs (but not bash!) works.
 the <edit> bit is as
 :results:
 #+BEGIN_EXAMPLE
-bash minshall-CF-R5KWPAXP: {877} diff -cb server-0.xkb works.xkb 
-*** server-0.xkb        2016-01-27 16:21:39.928866288 +0200
---- works.xkb   2016-01-27 16:14:43.362510720 +0200
-***************
-*** 1321,1332 ****
-      key <AB11> {         [       backslash,      underscore ] };
-      key <KATA> {         [        Katakana ] };
-      key <HIRA> {         [        Hiragana ] };
-!     key <HENK> {         [     Henkan_Mode ] };
-!     key <HKTG> {
-!         type= "PC_ALT_LEVEL2",
-!         symbols[Group1]= [ Hiragana_Katakana,          Romaji ]
-!     };
-!     key <MUHE> {         [        Muhenkan ] };
-      key <KPEN> {         [        KP_Enter ] };
-      key <RCTL> {         [       Control_R ] };
-      key <KPDV> {
---- 1321,1329 ----
-      key <AB11> {         [       backslash,      underscore ] };
-      key <KATA> {         [        Katakana ] };
-      key <HIRA> {         [        Hiragana ] };
-!     key <HENK> {         [     Meta_R ] };
-!     key <HKTG> {         [     Alt_R ] };
-!     key <MUHE> {         [        Meta_L ] };
-      key <KPEN> {         [        KP_Enter ] };
-      key <RCTL> {         [       Control_R ] };
-      key <KPDV> {
-bash minshall-CF-R5KWPAXP: {878} 
+ bash minshall-CF-R5KWPAXP: {877} diff -cb server-0.xkb works.xkb 
+ *** server-0.xkb        2016-01-27 16:21:39.928866288 +0200
+ --- works.xkb   2016-01-27 16:14:43.362510720 +0200
+ ***************
+ *** 1321,1332 ****
+       key <AB11> {         [       backslash,      underscore ] };
+       key <KATA> {         [        Katakana ] };
+       key <HIRA> {         [        Hiragana ] };
+ !     key <HENK> {         [     Henkan_Mode ] };
+ !     key <HKTG> {
+ !         type= "PC_ALT_LEVEL2",
+ !         symbols[Group1]= [ Hiragana_Katakana,          Romaji ]
+ !     };
+ !     key <MUHE> {         [        Muhenkan ] };
+       key <KPEN> {         [        KP_Enter ] };
+       key <RCTL> {         [       Control_R ] };
+       key <KPDV> {
+ --- 1321,1329 ----
+       key <AB11> {         [       backslash,      underscore ] };
+       key <KATA> {         [        Katakana ] };
+       key <HIRA> {         [        Hiragana ] };
+ !     key <HENK> {         [     Meta_R ] };
+ !     key <HKTG> {         [     Alt_R ] };
+ !     key <MUHE> {         [        Meta_L ] };
+       key <KPEN> {         [        KP_Enter ] };
+       key <RCTL> {         [       Control_R ] };
+       key <KPDV> {
+ bash minshall-CF-R5KWPAXP: {878} 
 #+END_EXAMPLE
 :end:
 
@@ -520,9 +520,46 @@ works.  so does
 setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -option japan:muhenkan_meta -print | xkbcomp -I./my-xkb/ - $DISPLAY 2>&1 | less
 #+END_SRC
 
-but, currently, hiragana-katakana_alt doesn't work
+**** hiragana-katakana <HKTG>
+    
+but, currently, hiragana-katakana_alt doesn't work.  it's defined as
+some sort of "group" shift character in the normal flow of things.
+setxkbmap seems happy enough with it, but xkbcomp doesn't do much
+with it.
 
-*** TODO bash
+#+BEGIN_EXAMPLE
+setxkbmap -I ./my-xkb/ -rules their-evdev -option japan:hiragana-katakana_alt -print | xkbcomp -I./my-xkb -xkb -w 10 - 2>&1 | less
+#+END_EXAMPLE
+gives lines including
+#+BEGIN_EXAMPLE
+Warning:          Symbol map for key <HKTG> redefined
+                  Using last definition for conflicting fields
+Warning:          Multiple symbols for level 1/group 1 on key <CAPS>
+                  Using Control_L, ignoring Eisu_toggle
+Warning:          Multiple symbols for level 2/group 1 on key <CAPS>
+                  Using Control_L, ignoring Caps_Lock
+Warning:          Symbol map for key <CAPS> redefined
+                  Using last definition for conflicting fields
+Warning:          Multiple symbols for level 1/group 1 on key <MUHE>
+                  Using Meta_L, ignoring Muhenkan
+Warning:          Symbol map for key <MUHE> redefined
+                  Using last definition for conflicting fields
+Warning:          Multiple symbols for level 1/group 1 on key <HENK>
+                  Using Meta_R, ignoring Henkan_Mode
+Warning:          Symbol map for key <HENK> redefined
+                  Using last definition for conflicting fields
+Warning:          Multiple symbols for level 1/group 1 on key <HKTG>
+                  Using Alt_R, ignoring Hiragana_Katakana
+Warning:          Symbol map for key <HKTG> redefined
+                  Using last definition for conflicting fields
+#+END_EXAMPLE
+and, out of that, <HENK> and <MUHE> work, while <HKTG> doesn't.
+well, maybe.  *this* works:
+#+BEGIN_EXAMPLE
+setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -option japan:muhenkan_meta -option japan:hiragana-katakana_alt -print | xkbcomp -I./my-xkb/ -w 10 - $DISPLAY 2>&1 | less
+#+END_EXAMPLE
+
+*** DONE bash
 
 also, Alt does *not* work for the shell.  on mbp, i have
 ~/.Xresources, with a line
@@ -531,9 +568,65 @@ Xterm*metaSendsEscape: true
 #+END_EXAMPLE
 which may be the reason?  well, if i ever get meta working, we'll see!
 
-** TODO del key
+well, seems to work with lxterminal, but not xterm.
+
+if i set metaSendsEscape (using C-down-mouse-1), it works.
+
+if i run "xterm -class Xterm", a) the screen goes black-on-white
+(rather than white-on-black), and b) meta-esc is i) displayed, and
+ii) works.  the a) behavior seems to be talked about in the man page
+#+BEGIN_EXAMPLE
+       foreground (class Foreground)
+               Specifies  the  color  to  use  for  displaying text in the window.  Setting the class name instead of the
+               instance name is an easy way to have everything that would normally appear in the text color change color.
+               The default is “XtDefaultForeground”.
+#+END_EXAMPLE
+
+xprop(1) seems to say that xterm's normal class is xterm, XTerm.
+#+BEGIN_EXAMPLE
+WM_CLASS(STRING) = "xterm", "XTerm"
+#+END_EXAMPLE
+oops.  i was setting Xterm*metaSendsEscape, rather than
+XTerm*metaSendsEscape.  change
+#+BEGIN_EXAMPLE
+XTerm*metaSendsEscape: true
+#+END_EXAMPLE
+sigh.  now works.
+** DONE ratpoison launches lxterminal, not xterm
+
+ratpoison 'C-t c' is bound to 'exec x-terminal-emulator', which is a
+symbolic link to /etc/alternatives/x-terminal-emulator, which is
+itself a symbolic link to /usr/bin/lxterminal.  apparently,
+update-alternatives(8) is the way this mechanism is managed.
+#+BEGIN_EXAMPLE
+sudo update-alternatives --config x-terminal-emulator
+#+END_EXAMPLE
+allowed me to change to have xterm be the primary.  (at the expense
+of losing the ability to use keys to copy/paste.)
+
+*** DONE xterm copy/paste
+
+according to the xterm(1) man page, the following might allow us to
+use C-S-c for copy, C-S-v for paste:
+#+BEGIN_EXAMPLE
+*VT100*translations:    #override \n\
+    Shift Ctrl <KeyPress> c: copy-selection(PRIMARY, CLIPBOARD) \n\
+    Shift Ctrl <KeyPress> v: insert-selection(PRIMARY, CLIPBOARD)
+#+END_EXAMPLE
+seems to work.
+
+** DONE del key
 
 i'd like, at least in emacs, for the DEL key to act as Backspace.
+
+the xmodmap(1) manpage says that
+#+BEGIN_EXAMPLE
+xmodmap -e "keysym BackSpace = Delete"
+#+END_EXAMPLE
+should do the trick.  almost (read the manual wrong?).  this does it:
+#+BEGIN_EXAMPLE
+xmodmap -e "keysym Delete = BackSpace"
+#+END_EXAMPLE
 
 ** DONE track pad
 

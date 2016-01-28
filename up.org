@@ -67,9 +67,8 @@ xkbcomp $DISPLAY ${fname}
 
 what's in [[file:/usr/share/X11/xkb/rules/base]]?
 
-the xkb wikipedia page points at [[http://michal.kosmulski.org/computing/articles/custom-keyboard-layouts-xkb.html][kosmulski]], 
-
-[[http://www.charvolant.org/~doug/xkb/html/xkb.html][charvolant]], which seems very good.  it includes these definitions
+the [[https://en.wikipedia.org/wiki/X_keyboard_extension][xkb wikipedia page]] points at [[http://michal.kosmulski.org/computing/articles/custom-keyboard-layouts-xkb.html][kosmulski]], and also at [[http://www.charvolant.org/~doug/xkb/html/xkb.html][charvolant]],
+which seems very good.  it includes these definitions
 #+BEGIN_EXAMPLE
 key codes
     A translation of the scan codes from the keyboard into a suitable symbolic form.
@@ -180,6 +179,8 @@ KeyPress event, serial 32, synthetic NO, window 0x1c00001,
     XFilterEvent returns: False
 #+END_EXAMPLE
 :end:
+
+[[file:///usr/share/doc/xorg-docs/input/XKB-Enhancing.html][xorg]] is also useful.
 
 [[file:/usr/share/X11/xkb/keycodes/evdev]] includes lines like
 #+BEGIN_EXAMPLE
@@ -596,7 +597,7 @@ sigh.  now works.
 
 ratpoison 'C-t c' is bound to 'exec x-terminal-emulator', which is a
 symbolic link to /etc/alternatives/x-terminal-emulator, which is
-itself a symbolic link to /usr/bin/lxterminal.  apparently,
+itself a symbolic link to /usr/bin/lxterminal.  [[http://superuser.com/questions/35275/ubuntus-etc-alternatives-mechanism][apparently]],
 update-alternatives(8) is the way this mechanism is managed.
 #+BEGIN_EXAMPLE
 sudo update-alternatives --config x-terminal-emulator
@@ -669,3 +670,13 @@ does the trick!  (see "man 4 synaptics".)
 
 as distributed, focus is by mouse.  it would be nice to have "click
 to activate"
+
+** TODO ls sorts .x near x
+
+something to do with [[http://stackoverflow.com/questions/878249/unixs-ls-sort-by-name][locale]].
+
+** TODO emacs keys for firefox
+** TODO packages for development
+this [[https://help.ubuntu.com/community/InstallingCompilers][ubuntu page]] documents some of the main packages to start
+developing.  [[http://packages.ubuntu.com/trusty/][here]] is listing of packages (for "trusty", which i think
+is the release we're running).

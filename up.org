@@ -370,7 +370,7 @@ options aren't found, etc.
 
 here's our try at some files.  turns out XkbRF_Load(3), that setxkbmap
 uses, needs to have rules/foo.lst, if one specifies -rules foo.
-#+BEGIN_SRC sh
+#+BEGIN_SRC sh :results silent
 mkdir my-xkb
 mkdir my-xkb/rules
 mkdir my-xkb/symbols
@@ -388,27 +388,121 @@ japan:hiragana_katakana_alt	Hiragana-Katakana as Alt_R
 EOF
 cat > my-xkb/symbols/my-jp <<EOF
 // Make the Muhenkan key a left Meta.
-partial modifier keys
+partial modifier_keys
 xkb_symbols "muhenkan_meta" {
     replace key <MUHE>	{ [ Meta_L ] };
 };
 
 // Make the Muhenkan key a right Meta.
-partial modifier keys
+partial modifier_keys
 xkb_symbols "henkan_meta" {
     replace key <HENK>	{ [ Meta_R ] };
 };
 
 // Make the Hiragana-Katakana key a right Alt.
-partial modifier keys
+partial modifier_keys
 xkb_symbols "hiragana-katakana_alt" {
     replace key <HKTG>	{ [ Alt_R ] };
 };
 EOF
-
 #+END_SRC
 
-#+RESULTS:
+hard getting this to work.  if i 
+#+BEGIN_EXAMPLE
+setxkbmap $DISPLAY
+<edit>
+setxkbmap server-0.xkb
+setxkbmap server-0.xkm
+#+END_EXAMPLE
+then emacs (but not bash!) works.
+
+the <edit> bit is as
+:results:
+#+BEGIN_EXAMPLE
+bash minshall-CF-R5KWPAXP: {877} diff -cb server-0.xkb works.xkb 
+*** server-0.xkb        2016-01-27 16:21:39.928866288 +0200
+--- works.xkb   2016-01-27 16:14:43.362510720 +0200
+***************
+*** 1321,1332 ****
+      key <AB11> {         [       backslash,      underscore ] };
+      key <KATA> {         [        Katakana ] };
+      key <HIRA> {         [        Hiragana ] };
+!     key <HENK> {         [     Henkan_Mode ] };
+!     key <HKTG> {
+!         type= "PC_ALT_LEVEL2",
+!         symbols[Group1]= [ Hiragana_Katakana,          Romaji ]
+!     };
+!     key <MUHE> {         [        Muhenkan ] };
+      key <KPEN> {         [        KP_Enter ] };
+      key <RCTL> {         [       Control_R ] };
+      key <KPDV> {
+--- 1321,1329 ----
+      key <AB11> {         [       backslash,      underscore ] };
+      key <KATA> {         [        Katakana ] };
+      key <HIRA> {         [        Hiragana ] };
+!     key <HENK> {         [     Meta_R ] };
+!     key <HKTG> {         [     Alt_R ] };
+!     key <MUHE> {         [        Meta_L ] };
+      key <KPEN> {         [        KP_Enter ] };
+      key <RCTL> {         [       Control_R ] };
+      key <KPDV> {
+bash minshall-CF-R5KWPAXP: {878} 
+#+END_EXAMPLE
+:end:
+
+so, sadly, it turns out one needs to point setxkbmap at an entire
+e.g., rules file.
+:results:
+#+BEGIN_EXAMPLE
+bash minshall-CF-R5KWPAXP: {600} setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -v 10
+Setting verbose level to 10
+locale is C
+Warning! Multiple definitions of rules file
+         Using command line, ignoring X server
+Trying to load rules file ./rules/their-evdev...
+Trying to load rules file /usr/share/X11/xkb/rules/their-evdev...
+Trying to load rules file ./my-xkb//rules/their-evdev...
+Success.
+Applied rules from their-evdev:
+rules:      their-evdev
+model:      pc105
+layout:     jp
+options:    ctrl:nocaps,japan:henkan_meta
+Trying to build keymap using the following components:
+keycodes:   evdev+aliases(qwerty)
+types:      complete
+compat:     complete+japan
+symbols:    pc+jp+inet(evdev)+ctrl(nocaps)+my-jp(henkan_meta)
+geometry:   pc(pc105)
+Error loading new keyboard description
+bash minshall-CF-R5KWPAXP: {601} 
+#+END_EXAMPLE
+:end:
+
+so, maybe copy evdev over, rename it, append our
+changes (above)?  no, that doesn't appear to work -- maybe one needs
+all the files in the same place?  no, tar everything over,
+'their-evdev' still generates an error.  file name appears somewhere
+else?  no, turned out we were finally processing japan:henkan_meta,
+and that i guess was failing?
+
+yes.  if i put in '-option henkan_foo', it's silently ignored.
+however, '-option henkan_meta' fails.  maybe their can't be two
+option sections in rules file?  try hand editing.  nope, that's not
+the problem.
+
+hmm, even if i get rid of that rule in the symbols file, i get the
+same error.  is it the - in the file name?  no, got rid of that,
+still same problem.
+
+turns out setxkbmap is telling the server to use our macro, but the
+server has never seen it.  so, need to "chain" with xkbcomp(1) (see
+man page for setxkbmap).
+
+#+BEGIN_EXAMPLE
+setxkbmap -I ./my-xkb/ -rules their-evdev -option "" -option ctrl:nocaps -option japan:henkan_meta -print | xkbcomp -I./my-xkb/ -
+#+END_EXAMPLE
+
 
 *** TODO bash
 

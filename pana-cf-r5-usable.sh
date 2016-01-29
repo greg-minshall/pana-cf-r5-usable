@@ -90,10 +90,17 @@ EOF
 	`# map Japanese-specific keys to meta, alt` \
     	-option japan:henkan_meta -option japan:muhenkan_meta -option japan:hiragana-katakana_alt \
 	-option japan:hztg_escape `# make zenkaku-hankaku an extra escape` \
+	-option altwin:alt_win `# make win key an extra alt` \
 	-print ${setuppipe} xkbcomp -I${dir}/xkb ${warnings} - $DISPLAY
 
     # xmodmap
+    # make Delete key act like BackSpace.
     ${setup} xmodmap -e "keysym Delete = BackSpace"
+    if [ $? != 0 ]; then
+	echo "note that \"xmodmap -e ...\" is *not* idempotent, so second+ invocations may result in an error"
+	# actually, errors *don't* get generated, probably because
+	# above xbcomp resets things nicely
+    fi
 
     # synclient (to get rid of annoying trackpad clicks)
     synclient TapButton1=0

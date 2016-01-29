@@ -1,4 +1,4 @@
-* trying to get this system up and running
+* trying to get a Panasonic CF-R5 up and running
 
 ** DONE control key
 
@@ -678,11 +678,16 @@ to activate"
 
 something to do with [[http://stackoverflow.com/questions/878249/unixs-ls-sort-by-name][locale]].
 
-** TODO emacs keys for firefox
+** DONE emacs keys for firefox
 
 some firefox [[https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly?redirectlocale=en-US&redirectslug=Keyboard+shortcuts][shortcuts]].
 
 and, [[http://kb.mozillazine.org/Emacs_Keybindings_%28Firefox%29][here's]] the answer for emacs/readline bindings.
+
+put this is ~/.gtkrc-2.0
+#+BEGIN_EXAMPLE
+gtk-key-theme-name = "Emacs"
+#+END_EXAMPLE
 
 ** DONE packages for development
 this [[https://help.ubuntu.com/community/InstallingCompilers][ubuntu page]] documents some of the main packages to start

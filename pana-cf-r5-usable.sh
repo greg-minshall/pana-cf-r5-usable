@@ -117,13 +117,21 @@ EOF
 gtk-key-theme-name = "Emacs"
 EOF
     fi
+
+    # get mac-like vertical scrolling (if requested)
+    if [ $notmaclike == 0 ]; then
+	macminus="-"		# make vertical scrolling mac-like
+    else
+	macminus=""		# make vertical scrolling un-mac-like
+    fi
+    ${setup} synclient VertScrollDelta=${macminus}`synclient | grep VertScrollDelta | sed s/-//g | awk '{print $3}'`
 }
 
 name=$0
 
-usage() { echo "usage: $name [--setup] [--verbose] [--cleanup] [--force] [--dir dirname] [--xkb dirname]" >&2; exit 1; }
+usage() { echo "usage: $name [--cleanup] [--force] [--notmaclike] [--setup] [--verbose] [--dir dirname] [--xkb dirname]" >&2; exit 1; }
 
-TEMP=`getopt -n "$name" -o "" --long setup,verbose,cleanup,force,dir:,xkb: -- "$@"`
+TEMP=`getopt -n "$name" -o "" --long cleanup,force,notmaclike,setup,verbose,dir:,xkb: -- "$@"`
 
 if [ $? != 0 ] ; then usage; fi # usage() does NOT return
 
@@ -133,6 +141,7 @@ eval set -- "$TEMP"
 cleanup=0
 dir=/var/tmp/${USER}/${name}
 force=0
+notmaclike=0
 setup=""
 setuppipe='|'
 verbose=0
@@ -143,6 +152,7 @@ while true ; do
 	--cleanup) cleanup=1; shift ;;
 	--dir) dir=$2; shift 2 ;;
 	--force) force=1; shift ;;
+	--notmaclike) notmaclike=1; shift ;;
 	--setup) setup=echo; setuppipe='\|'; shift ;; # echo commands rather than executing them
 	--verbose) verbose=1; shift ;;
 	--xkb) xkb=$2; shift 2 ;;

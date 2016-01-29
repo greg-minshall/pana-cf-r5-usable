@@ -693,3 +693,10 @@ gtk-key-theme-name = "Emacs"
 this [[https://help.ubuntu.com/community/InstallingCompilers][ubuntu page]] documents some of the main packages to start
 developing.  [[http://packages.ubuntu.com/trusty/][here]] is listing of packages (for "trusty", which i think
 is the release we're running).
+** DONE make vertical scrolling [modern] Mac-like
+
+see synaptics(4).
+#+BEGIN_EXAMPLE
+synclient VertScrollDelta=-`synclient | grep VertScrollDelta | awk '{print $3}'`
+#+END_EXAMPLE
+that does it.

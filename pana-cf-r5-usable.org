@@ -700,3 +700,8 @@ see synaptics(4).
 synclient VertScrollDelta=-`synclient | grep VertScrollDelta | awk '{print $3}'`
 #+END_EXAMPLE
 that does it.
+** [[http://askubuntu.com/questions/258922/how-to-display-notebook-model-number][to find out computer model]]
+#+BEGIN_EXAMPLE
+% sudo dmidecode -s system-product-name
+CF-R5KWPAXP
+#+END_EXAMPLE

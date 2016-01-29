@@ -1,0 +1,35 @@
+* pana-cf-r5-usable
+
+this small shell script (accompanied by an emacs org-mode file, which
+sort of documents the process of arriving at the shell script)
+re-configures the keyboard, and other low-level bits, of a Linux
+system (Kubuntu is what i am using) to make it more pallatable to me,
+a non-Japanese speaker.  the main thing is making use of the specific
+Japanese-language keys (Zenkaku Hankaku, Muhenkan, Henkan,
+Hiragana-Katakana) as additional escape, meta, and alt keys.
+
+the script also redefines the CAPS LOCK key as an additional Ctrl
+(control key); makes the Windows key an additional Alt key; and
+redefines the Del key to be an additional BackSpace key.
+
+in addition, this adds copy and paste to xterm(1) (via C-S-c and
+C-S-v) as well as making meta (and alt) send an Escape to xterm (so
+that, e.g., M-b goes back one word in bash(1)).
+
+this script turns off the click feature of the trackpad.  also, unless
+the _--notmaclike_ option is given, the script configures the trackpad
+to do vertical scrolling like [more modern] Macintoshes.
+
+among other things, the script invokes xkbcomp(1), which will likely
+generate a number of warnings, such as:
+#+BEGIN_EXAMPLE
+Warning:          Key <I195> not found in evdev+aliases(qwerty) keycodes
+                  Symbols ignored
+Warning:          Key <I196> not found in evdev+aliases(qwerty) keycodes
+                  Symbols ignored
+Warning:          Key <I255> not found in evdev+aliases(qwerty) keycodes
+                  Symbols ignored
+Warning:          No symbols defined for <JPCM> (keycode 103)
+Warning:          No symbols defined for <I120> (keycode 120)
+#+END_EXAMPLE
+these can be safely ignored.

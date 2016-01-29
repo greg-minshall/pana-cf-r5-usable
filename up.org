@@ -610,6 +610,9 @@ of losing the ability to use keys to copy/paste.)
 according to the xterm(1) man page, the following might allow us to
 use C-S-c for copy, C-S-v for paste:
 #+BEGIN_EXAMPLE
+! make M-b, et al., work
+XTerm*metaSendsEscape: true
+! in xterm (and friends), make C-S-c copy, and C-S-v paste
 *VT100*translations:    #override \n\
     Shift Ctrl <KeyPress> c: copy-selection(PRIMARY, CLIPBOARD) \n\
     Shift Ctrl <KeyPress> v: insert-selection(PRIMARY, CLIPBOARD)
@@ -676,7 +679,12 @@ to activate"
 something to do with [[http://stackoverflow.com/questions/878249/unixs-ls-sort-by-name][locale]].
 
 ** TODO emacs keys for firefox
-** TODO packages for development
+
+some firefox [[https://support.mozilla.org/en-US/kb/keyboard-shortcuts-perform-firefox-tasks-quickly?redirectlocale=en-US&redirectslug=Keyboard+shortcuts][shortcuts]].
+
+and, [[http://kb.mozillazine.org/Emacs_Keybindings_%28Firefox%29][here's]] the answer for emacs/readline bindings.
+
+** DONE packages for development
 this [[https://help.ubuntu.com/community/InstallingCompilers][ubuntu page]] documents some of the main packages to start
 developing.  [[http://packages.ubuntu.com/trusty/][here]] is listing of packages (for "trusty", which i think
 is the release we're running).

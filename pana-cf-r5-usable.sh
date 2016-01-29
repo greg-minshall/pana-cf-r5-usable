@@ -27,7 +27,9 @@ XTerm*metaSendsEscape: true
 ! in xterm (and friends), make C-S-c copy, and C-S-v paste
 *VT100*translations:    #override \n\\
     Shift Ctrl <KeyPress> c: copy-selection(PRIMARY, CLIPBOARD) \n\\
-    Shift Ctrl <KeyPress> v: insert-selection(PRIMARY, CLIPBOARD)
+    Shift Ctrl <KeyPress> v: insert-selection(PRIMARY, CLIPBOARD) \n\\
+    Meta Ctrl <KeyPress> c: copy-selection(PRIMARY, CLIPBOARD) \n\\
+    Meta Ctrl <KeyPress> v: insert-selection(PRIMARY, CLIPBOARD)
 EOF
     if [ $force == 0 ]; then
 	xrdbparm=merge;

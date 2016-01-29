@@ -79,11 +79,18 @@ EOF
     else
 	clear='-option ""';
     fi
-    ${setup} setxkbmap -I ${dir}/xkb -rules hybrid-evdev ${clear} \
-	-option ctrl:nocaps \
-	-option japan:henkan_meta -option japan:muhenkan_meta -option japan:hiragana-katakana_alt \
-	-print > ${dir}/setxkbmap
-    xkbcomp -I${dir}/xkb -w 10 - $DISPLAY
+    if [ $verbose == 0 ]; then
+	warnings="";
+    else
+	warnings="-w 10"
+    fi
+    # http://stackoverflow.com/a/12797512 for backtick comment trick
+    eval ${setup} setxkbmap -I ${dir}/xkb -rules hybrid-evdev ${clear} \
+	-option ctrl:nocaps	`# make capslock an extra control key` \
+	`# map Japanese-specific keys to meta, alt` \
+    	-option japan:henkan_meta -option japan:muhenkan_meta -option japan:hiragana-katakana_alt \
+	-option japan:hztg_escape `# make zenkaku-hankaku an extra escape` \
+	-print ${setuppipe} xkbcomp -I${dir}/xkb ${warnings} - $DISPLAY
 
     # xmodmap
     ${setup} xmodmap -e "keysym Delete = BackSpace"
@@ -94,19 +101,21 @@ EOF
 
 name=$0
 
-usage() { echo "usage: $name [--setup] [--cleanup] [--force] [--dir dirname] [--xkb dirname]" >&2; exit 1; }
+usage() { echo "usage: $name [--setup] [--verbose] [--cleanup] [--force] [--dir dirname] [--xkb dirname]" >&2; exit 1; }
 
-TEMP=`getopt -n "$name" -o "" --long setup,cleanup,force,dir:,xkb: -- "$@"`
+TEMP=`getopt -n "$name" -o "" --long setup,verbose,cleanup,force,dir:,xkb: -- "$@"`
 
 if [ $? != 0 ] ; then usage; fi # usage() does NOT return
 
 # Note the quotes around `$TEMP': they are essential!
 eval set -- "$TEMP"
 
-setup=""
 cleanup=0
-force=0
 dir=/var/tmp/${USER}/${name}
+force=0
+setup=""
+setuppipe='|'
+verbose=0
 xkb=/usr/share/X11/xkb
 
 while true ; do
@@ -114,7 +123,8 @@ while true ; do
 	--cleanup) cleanup=1; shift ;;
 	--dir) dir=$2; shift 2 ;;
 	--force) force=1; shift ;;
-	--setup) setup=echo; shift ;; # echo commands rather than executing them
+	--setup) setup=echo; setuppipe='\|'; shift ;; # echo commands rather than executing them
+	--verbose) verbose=1; shift ;;
 	--xkb) xkb=$2; shift 2 ;;
 	--) shift ; break ;;
 	*) echo "Internal error!" ; exit 1 ;;

@@ -13,7 +13,7 @@
 # getopt processing.  see
 # /usr/share/doc/util-linux/examples/getopt-parse.bash
 
-ensure() { echo "XXX implement ensure!!"; }
+ensure() { mkdir -p ${dir}; }
 
 cleanup() { echo "XXX implement cleanup!!"; }
 
@@ -103,7 +103,20 @@ EOF
     fi
 
     # synclient (to get rid of annoying trackpad clicks)
-    synclient TapButton1=0
+    ${setup} synclient TapButton1=0
+
+    # try to get emacs/readline keybindings for firefox
+    # (need to restart firefox *after* this!)
+    gtkrc=~/.gtkrc-2.0
+    if [ ! -e ~/${gtkrc} ]; then
+	touch ${gtkrc}
+    fi
+    if ! grep -q gtk-key-theme-name ${gtkrc}; then
+	cat >> ${gtkrc} <<EOF
+
+gtk-key-theme-name = "Emacs"
+EOF
+    fi
 }
 
 name=$0
